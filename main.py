@@ -5,3 +5,7 @@ app.config['SECRET_KEY'] = 'this is a not a secret'
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+#@app.route('/login', methods=['POST', 'GET'])
+    #def appeLogin():
+        #return LogUser()

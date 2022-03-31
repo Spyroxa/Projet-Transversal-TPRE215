@@ -22,12 +22,7 @@ if __name__ == '__main__':
 
 
     @app.route('/form', methods=['GET', 'POST'])
-    def ajoutEtape():
-        formEntreprise = FormulaireCreationEntreprise()
+    def ajoutEntreprise():
         render_template('login.html')
-        if formEntreprise.validate_on_submit():
-            return("t'es trop fort mec")
-        else:
-            return("crotte")
 
 app.run(debug=True)

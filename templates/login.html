@@ -1,6 +1,5 @@
-{% extends 'bootstrap/base.html' %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% extends 'baseAdmin.html' %}
+{% extends 'base.html' %}
 {% block title %}  {{ title }}  {% endblock %}
 
 {% block styles %}
@@ -8,12 +7,6 @@
   <link rel="stylesheet"
           href="{{ url_for('static', filename='../static/style.css') }}">
 {% endblock %}
-
-
-{% block title %}
-Valac
-{% endblock %}
-
 
 {% block content %}
 

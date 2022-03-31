@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash, request, Blu
 from flask_wtf import FlaskForm
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitFiel
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'this is a not a secret'

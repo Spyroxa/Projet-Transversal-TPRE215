@@ -21,7 +21,7 @@ if __name__ == '__main__':
         valider = SubmitField('Valider')
 
 
-    @app.route('/valac/ajouter-une-entreprise/', methods=['GET', 'POST'])
+    @app.route('/form', methods=['GET', 'POST'])
     def ajoutEtape():
         formEntreprise = FormulaireCreationEntreprise()
         if formEntreprise.validate_on_submit():

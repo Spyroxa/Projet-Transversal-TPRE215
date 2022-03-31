@@ -1,14 +1,14 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, Blueprint, make_response, session
+from flask import Flask, render_template, url_for, Blueprint
 from flask_wtf import FlaskForm
-from flask_bootstrap import Bootstrap
-from flask_sqlalchemy import SQLAlchemy
-from wtforms import StringField, SubmitFiel
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'this is a not a secret'
+from wtforms import StringField, SubmitField, BooleanField, IntegerField, \
+    SelectField, DecimalField, DateField
+from wtforms.validators import DataRequired, NumberRange
+from connectBDD import DBSingleton
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app = Flask(__name__)
+    db = DBSingleton.Instance()
+    app.config['SECRET_KEY'] = 'this is not a secret'
 
     class FormulaireCreationEntreprise(FlaskForm):
 
@@ -24,6 +24,7 @@ if __name__ == '__main__':
     @app.route('/form', methods=['GET', 'POST'])
     def ajoutEtape():
         formEntreprise = FormulaireCreationEntreprise()
+        render_template('login.html')
         if formEntreprise.validate_on_submit():
             return("t'es trop fort mec")
         else:

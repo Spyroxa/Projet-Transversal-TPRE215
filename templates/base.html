@@ -1,52 +1,34 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
 
-<head>
+<html lang="fr">
+
+  <head>
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>valac authentification</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, target-densitydpi=device-dpi">
+    <meta property="og:image" content="../static/images/logo.png">
+    <meta property="og:description" content="Venez visiter les différents pays grâce à nos différents circuits !">
+    <meta property="og:title" content="HappyFly">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-</head>
+    <link rel="stylesheet" href="../static/style.css"/>
+    <link rel="stylesheet" href="../static/style_connexion_inscription.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" rel="stylesheet">
+    <title>La jolie Boite a code{% block title %} {% endblock %}</title>
 
-<body>
-    <section class="hero is-primary is-fullheight">
+  </head>
 
-        <div class="hero-head">
-            <nav class="navbar">
-                <div class="container">
+  <body>
 
-                    <div id="navbarMenuHeroA" class="navbar-menu">
-                        <div class="navbar-end">
-                            <a href="{{ url_for('app.index') }}" class="navbar-item">
-                                Home
-                            </a>
-                            <a href="{{ url_for('app.main') }}" class="navbar-item">
-                                Profile
-                            </a>
-                            <a href="{{ url_for('auth.login') }}" class="navbar-item">
-                                Login
-                            </a>
-                            <a href="{{ url_for('auth.signup') }}" class="navbar-item">
-                                Sign Up
-                            </a>
-                            <a href="{{ url_for('auth.logout') }}" class="navbar-item">
-                                Logout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-        </div>
+    <div class="container">
+      <a href="/" class="bouton-retour">↩</a>
+      <img type="png" src="../static/images/photo_profile.png">
+      {% block content %}
 
-        <div class="hero-body">
-            <div class="container has-text-centered">
-               {% block content %}
-               {% endblock %}
-            </div>
-        </div>
-    </section>
-</body>
+      {% endblock %}
+    </div>
 
+  </body>
 </html>

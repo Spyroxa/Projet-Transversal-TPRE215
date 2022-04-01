@@ -5,7 +5,7 @@ from wtforms import StringField, SubmitField, BooleanField, IntegerField, \
     SelectField, DecimalField, DateField
 from wtforms.validators import DataRequired, NumberRange
 from connectBDD import DBSingleton
-
+from insertion import ajouterEntreprise
 if __name__ == '__main__':
     app = Flask(__name__)
     Bootstrap(app)
@@ -29,5 +29,6 @@ if __name__ == '__main__':
         form = FormulaireCreationEntreprise()
 
         return render_template('login.html', form=form)
-
+    def ajouterEntreprise():
+        return ajouterEntreprise()
 app.run(debug=True)

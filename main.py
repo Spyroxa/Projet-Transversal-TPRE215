@@ -36,19 +36,17 @@ if __name__ == '__main__':
     @app.route('/form', methods=['GET', 'POST'])
     def ajoutEntreprise():
         form = FormulaireCreationEntreprise()
-        print("ca rentre pas dans la boucle")
         if form.validate_on_submit():
-            if verificationEntreprise()==True:
-                params: tuple = (
-                form.nom.data, form.numSiret.data, form.adressePostale.data,
-                form.codePostal.data, form.ville.data,
-                form.description.data)
+            params: tuple = (
+            form.nom.data, form.numSiret.data, form.adressePostale.data,
+            form.codePostal.data, form.ville.data,
+            form.description.data, form.url.data)
 
-                sql = "INSERT INTO circuit (nom, n°siret, adressePostale, codePostal, ville, description, url,) \
-             VALUES (%s,%s,%s,%s,%s,%s,%s); "
-                db.query(sql, params)
-            else:
-                print("ca rentre dans la boucle mais ca marche pas")
+            sql = "INSERT INTO entreprise (nom, NSiret, adressePostale, codePostal, ville, description, url) VALUES (%s,%s,%s,%s,%s,%s,%s); "
+            db.query(sql, params)
+            print("t'es un putain de génie")
+        else:
+            print(" ca marche pas")
 
         return render_template('login.html', form=form)
 app.run(debug=True)

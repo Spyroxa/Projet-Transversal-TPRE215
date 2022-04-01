@@ -12,6 +12,14 @@ if __name__ == '__main__':
     db = DBSingleton.Instance()
     app.config['SECRET_KEY'] = 'this is not a secret'
 
+    def verificationEntreprise(nom):
+        lenom: tuple = (nom,)
+        sql = "SELECT id FROM entreprise WHERE nom = %s;"
+        db.query(sql, lenom)
+        if db.result == []:
+            return False
+        else:
+            return True
 
     class FormulaireCreationEntreprise(FlaskForm):
 
@@ -20,15 +28,27 @@ if __name__ == '__main__':
         adressePostale = StringField("adresse principale de l'entreprise", validators=[DataRequired()])
         codePostal = StringField("Code postal", validators=[DataRequired()])
         ville = StringField("ville de location", validators=[DataRequired()])
-        description = StringField("description de l'entreprise", validators=[DataRequired()])
+        description = StringField("description de l'entreprise", )
+        url = StringField("url du site" , )
         valider = SubmitField('Valider')
 
 
     @app.route('/form', methods=['GET', 'POST'])
     def ajoutEntreprise():
         form = FormulaireCreationEntreprise()
+        print("ca rentre pas dans la boucle")
+        if form.validate_on_submit():
+            if verificationEntreprise()==True:
+                params: tuple = (
+                form.nom.data, form.numSiret.data, form.adressePostale.data,
+                form.codePostal.data, form.ville.data,
+                form.description.data)
+
+                sql = "INSERT INTO circuit (nom, n°siret, adressePostale, codePostal, ville, description, url,) \
+             VALUES (%s,%s,%s,%s,%s,%s,%s); "
+                db.query(sql, params)
+            else:
+                print("ca rentre dans la boucle mais ca marche pas")
 
         return render_template('login.html', form=form)
-    def ajouterEntreprise():
-        return ajouterEntreprise()
 app.run(debug=True)

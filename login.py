@@ -11,8 +11,8 @@ app.config['SECRET_KEY'] = 'this is not a secret'
 Bootstrap(app)
 
 
-class authform(FlaskForm):
-    login = TextAreaField('mail', validators=[DataRequired()])
+class authForm(FlaskForm):
+    login = StringField('Login', validators=[DataRequired()])
     MDP = PasswordField('Mot de passe', validators=[DataRequired()])
     submit = SubmitField('Submit')
     session_LOGIN = None
@@ -21,7 +21,7 @@ class authform(FlaskForm):
 
 
 def log():
-    form = authform()
+    form = authForm()
     cookie = False
     retourner = [None, None, None, cookie]
     if form.validate_on_submit():
@@ -35,7 +35,7 @@ def log():
         else:
             true_login = temp[0][0]
             if true_login == login:
-                sql = f"SELECT motDePasse FROM utilisateur WHERE motDePasse = '{login}'"
+                sql = f"SELECT motDePasse FROM utilisateur WHERE login = '{login}'"
                 db_instance = DBSingleton.Instance()
                 temp = db_instance.query(sql)
                 password = temp[0][0]
@@ -55,16 +55,17 @@ def log():
 
 def LogUser():
     cookie = log()
-    form = authform()
+    form = authForm()
     ID = cookie[0]
     print(cookie)
     session['user'] = {"info": cookie}
     print(session['user']['info'])
     title = 'login'
-    result = render_template('login.html', form=form, title=title)
-    if cookie[3] is True:
-            result = redirect('/admin')
+    result = render_template('user.html', form=form, title=title)
+    if cookie[0] is True:
+        result = redirect('/user')
     return result
+
 
 
 if __name__ == '__main__':

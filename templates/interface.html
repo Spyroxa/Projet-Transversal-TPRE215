@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}  {{ title }}  {% endblock %}
+
+{% block content %}
+
+<div>
+
+    {% for post in posts %}
+    <div class="table">
+    <table>
+        <tr>
+            <th scope="col">Nom : {{ post[0] }}</th>
+            <th scope="col">Numero de Siret : {{ post[1] }}</th>
+            <th scope="col">Adresse Postal : {{ post[2] }}</th>
+            <th scope="col">Code Postal : {{ post[3] }}</th>
+            <th scope="col">Ville : {{ post[4] }}</th>
+            <th scope="col">Description : {{ post[5] }}</th>
+            <th scope="col">Url : {{ post[6] }}</th>
+            <th scope="col">Nombre de facture : {{ post[7] }}</th>
+        </tr>
+        <a href="/contact"><input class="modif"
+       type="button"
+       value="Voir les contacts"></a>
+    </table>
+    </div>
+    {% endfor %}
+</div>
+<div>
+    <a href="/form"><input class="modif"
+       type="button"
+       value="Ajouter un nouveau prospect"></a>
+    <a href="/del"><input class="modif"
+       type="button"
+       value="Supprimer un prospect"></a>
+</div>
+{% endblock %}

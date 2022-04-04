@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}  {{ title }}  {% endblock %}
+
+{% block content %}
+
+<div>
+
+    {% for post in posts %}
+    <div class="table">
+    <table>
+        <tr>
+            <th scope="col">Auteur : {{ post[0] }}</th>
+            <th scope="col">Description: {{ post[1] }}</th>
+            <th scope="col">Date d'envoie : {{ post[2] }}</th>
+        </tr>
+
+    </table>
+    </div>
+    {% endfor %}
+</div>
+<a href="/user"><input class="modif"
+       type="button"
+       value="Accueil"></a>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}  {{ title }}  {% endblock %}
+
+{% block content %}
+
+<div>
+
+    {% for post in posts %}
+    <div class="table">
+    <table>
+        <tr>
+            <th scope="col">Nom : {{ post[0] }}</th>
+            <th scope="col">Prénom: {{ post[1] }}</th>
+            <th scope="col">Email : {{ post[2] }}</th>
+            <th scope="col">Poste : {{ post[3] }}</th>
+            <th scope="col">Telephone : {{ post[4] }}</th>
+            <th scope="col">Statut : {{ post[5] }}</th>
+            <th scope="col">Url : {{ post[6] }}</th>
+            <th scope="col">Nombre de facture : {{ post[7] }}</th>
+        </tr>
+        <a href="/com"><input class="modif"
+       type="button"
+       value="Voir les commentaires"></a>
+    </table>
+    </div>
+    {% endfor %}
+</div>
+<div>
+    <a href="/form"><input class="modif"
+       type="button"
+       value="Ajouter un nouveau contact"></a>
+    <a href="/del"><input class="modif"
+       type="button"
+       value="Supprimer un contact"></a>
+</div>
+<a href="/user"><input class="modif"
+       type="button"
+       value="Accueil"></a>
+{% endblock %}

@@ -1,10 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}  {{ title }}  {% endblock %}
 
-</body>
-</html>
+{% block content %}
+
+<form method="POST">
+
+  {% for post in posts %}
+        <section>
+          <div class="bloc_reservation">
+            <a href="/" class="details" type="submit">+</a>
+            <input type="radio" name="id" value= {{post[0]}}><br>
+            <div><label for="nom">Nom</label> :<br> {{ post[1] }}<br></div>
+            <div>Numero de siret : {{ post[2] }}<br></div>
+            <div>Adresse postale : {{ post[3] }}<br></div>
+              <div>Code postal : {{ post[4] }}<br></div>
+            <div>Ville : {{ post[5] }} <br></div>
+              <div>Descrpition : {{ post[6] }} <br></div>
+              <div>Url : {{ post[7] }} <br></div>
+          </div>
+        </section>
+        <div class="barre-transition" id={{post[0]}}></div>
+</form>
+      {% endfor %}
+
+{% endblock %}
+

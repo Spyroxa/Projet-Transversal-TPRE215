@@ -1,10 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}  {{ title }}  {% endblock %}
 
-</body>
-</html>
+{% block content %}
+
+<div>
+    <div class="table">
+    <table>
+    {% for post in posts %}
+
+        <tr>
+             <th scope="col">Nom : {{ post[0] }}</th>
+            <th scope="col">Prénom: {{ post[1] }}</th>
+            <th scope="col">Email : {{ post[2] }}</th>
+            <th scope="col">Poste : {{ post[3] }}</th>
+            <th scope="col">Telephone : {{ post[4] }}</th>
+            <th scope="col">Statut : {{ post[5] }}</th>
+            <th scope="col">Entreprise : {{ post[6] }}</th>
+            <th scope="col">
+                <input type="radio" name="post_id" value="{{ post[7] }}">
+                    Sélection :
+                </input></th>
+        </tr>
+
+
+    {% endfor %}
+    </table>
+    <button class="button" type="submit">modifier</button>
+    </div>
+</div>
+<a href="/user"><input class="modif"
+       type="button"
+       value="Accueil"></a>
+{% endblock %}

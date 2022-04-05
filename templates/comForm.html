@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf%}
+{% block content %}
+<form method="post" class="centrer">
+            <div>
+                <label> Auteur <input type="text" id="auteur" name="auteur"></label>
+            </div>
+            <div>
+                <label> Description <input type="text" id="description" name="description"></label>
+            </div>
+            <div>
+                <label> Date<input type="date" id="date" name="date"></label>
+            </div>
+            <label>Contact</label>
+                <select id="contact" name="contact">
+                    {% for value in reponses %}
+                        <option value="{{ value[0] }}">{{ value[0] }} {{ value[1] }}</option>
+                    {% endfor %}
+                </select>
+                <button class="button" type="submit">Ajout commentaire</button>
+            <a href="/user"><input class="modif"
+       type="button"
+       value="Accueil"></a>
+            </div>
+        </form>
+
+{% endblock %}
+</body>

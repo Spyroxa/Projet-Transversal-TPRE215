@@ -6,7 +6,7 @@ from wtforms import StringField, SubmitField, BooleanField, IntegerField, \
 from wtforms.validators import DataRequired, NumberRange
 from connectBDD import DBSingleton
 from insertion import ajouterEntreprise
-from login import LogUser,log
+from login import LogUser,log,is_valid_session
 from visual import User
 
 
@@ -47,24 +47,31 @@ if __name__ == '__main__':
         poste = StringField("Prenom du contact", validators=[DataRequired()])
         valider = SubmitField('Valider')
 
+    class FormulaireCreationCom(FlaskForm):
+        auteur = StringField("Auteur", validators=[DataRequired()])
+        description = StringField("Description de l'entreprise",validators=[DataRequired()])
+        date = DateField("Date du commentaire",validators=[DataRequired()])
+        valider = SubmitField('Valider')
+
     class BarreDeRecherche(FlaskForm):
         filtre = StringField("Nom du contact", validators=[DataRequired()])
         valider = SubmitField('Valider')
 
     @app.route('/form', methods=['GET', 'POST'])
     def ajoutEntreprise():
-        form = FormulaireCreationEntreprise()
-        if form.validate_on_submit():
-            params: tuple = (
-            form.nom.data, form.numSiret.data, form.adressePostale.data,
-            form.codePostal.data, form.ville.data,
-            form.description.data, form.url.data)
+        if is_valid_session:
+            form = FormulaireCreationEntreprise()
+            if form.validate_on_submit():
+                params: tuple = (
+                form.nom.data, form.numSiret.data, form.adressePostale.data,
+                form.codePostal.data, form.ville.data,
+                form.description.data, form.url.data)
 
-            sql = "INSERT INTO entreprise (nom, NSiret, adressePostale, codePostal, ville, description, url) VALUES (%s,%s,%s,%s,%s,%s,%s); "
-            db.query(sql, params)
-            print("ça marche")
-        else:
-            print(" ça marche pas")
+                sql = "INSERT INTO entreprise (nom, NSiret, adressePostale, codePostal, ville, description, url) VALUES (%s,%s,%s,%s,%s,%s,%s); "
+                db.query(sql, params)
+                print("ça marche")
+            else:
+                print(" ça marche pas")
 
         return render_template('login.html', form=form)
 
@@ -80,34 +87,42 @@ if __name__ == '__main__':
         identreprise = reponse[0]
         return stringer(identreprise)
 
+    def getidcontact(nom):
+        tab: tuple = (nom,)
+        sql = "SELECT idpersonne FROM personne WHERE nom = %s;"
+        reponse = db.query(sql, tab)
+        idpersonne = reponse[0]
+        return stringer(idpersonne)
+
     @app.route('/ajout-contact', methods=['GET', 'POST'])
     def ajoutContact():
-        sql = "SELECT nom FROM entreprise"
-        db.query(sql, )
-        reponse = db.query(sql, )
-        if reponse == []:
-            print("pas d'entreprise donc pas de contacts")
-        else:
-            if request.method == 'POST':
-                nom = request.form['nom']
-                prenom = request.form['prenom']
-                email = request.form['email']
-                poste = request.form['poste']
-                telephone = request.form['telephone']
-                print(request.form)
-                actif = 1 if 'statut' in request.form else 0
-                entreprise = getidentreprise(request.form['entreprise'])
-                record = (nom, prenom, email, poste, telephone, actif, entreprise)
-                print(record)
-                try:
-                    sql = """INSERT INTO personne (nom, prenom, email, poste, telephone, statut, entreprise_identreprise) 
-                                VALUES ('%s', '%s', '%s', '%s', %s, '%s', %s);""" % record
-                    db_instance = DBSingleton.Instance()
-                    db_instance.query(sql)
-                except:
-                    print('pas bon')
+        if is_valid_session:
+            sql = "SELECT nom FROM entreprise"
+            db.query(sql, )
+            reponse = db.query(sql, )
+            if reponse == []:
+                print("pas d'entreprise donc pas de contacts")
+            else:
+                if request.method == 'POST':
+                    nom = request.form['nom']
+                    prenom = request.form['prenom']
+                    email = request.form['email']
+                    poste = request.form['poste']
+                    telephone = request.form['telephone']
+                    print(request.form)
+                    actif = 1 if 'statut' in request.form else 0
+                    entreprise = getidentreprise(request.form['entreprise'])
+                    record = (nom, prenom, email, poste, telephone, actif, entreprise)
+                    print(record)
+                    try:
+                        sql = """INSERT INTO personne (nom, prenom, email, poste, telephone, statut, entreprise_identreprise) 
+                                    VALUES ('%s', '%s', '%s', '%s', %s, '%s', %s);""" % record
+                        db_instance = DBSingleton.Instance()
+                        db_instance.query(sql)
+                    except:
+                        print('pas bon')
             retourner = render_template('contactForm.html', reponses=reponse)
-            return retourner
+        return retourner
 
 
     @app.route('/', methods=['POST', 'GET'])
@@ -116,24 +131,25 @@ if __name__ == '__main__':
 
     @app.route('/user', methods=['POST', 'GET'])
     def user():
-        title = 'formulaire'
-        sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,COUNT(numeroFacture) FROM entreprise LEFT JOIN facture ON identreprise = facture.entreprise_identreprise GROUP BY nom ORDER BY nom"""
-        db_instance = DBSingleton.Instance()
-        posts = db_instance.query(sql)
-        retourner = render_template('interface.html', title=title, posts=posts)
+        if is_valid_session:
+            title = 'formulaire'
+            sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,COUNT(numeroFacture) FROM entreprise LEFT JOIN facture ON identreprise = facture.entreprise_identreprise GROUP BY nom ORDER BY nom"""
+            db_instance = DBSingleton.Instance()
+            posts = db_instance.query(sql)
+            retourner = render_template('interface.html', title=title, posts=posts)
         return retourner
 
 
     @app.route('/del', methods=['POST', 'GET'])
     def deluser():
         title = 'formulaire'
-        sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,identreprise FROM entreprise"""
+        sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,identreprise,COUNT(numeroFacture) FROM entreprise LEFT JOIN facture ON identreprise = facture.entreprise_identreprise GROUP BY nom ORDER BY nom"""
         db_instance = DBSingleton.Instance()
         posts = db_instance.query(sql)
         retourner = render_template('delentreprise.html', title=title, posts=posts)
         if request.method == "POST":
-            identreprise = request.form['id']
-            sql = f"DELETE FROM entreprise WHERE identreprise NOT IN (SELECT entreprise_identreprise FROM facture) AND identreprise = {id}"
+            ID = request.form['post_id']
+            sql = f"DELETE FROM entreprise WHERE identreprise NOT IN (SELECT entreprise_identreprise FROM facture) AND identreprise = {ID}"
             print(sql)
             db_instance = DBSingleton.Instance()
             db_instance.query(sql)
@@ -149,45 +165,26 @@ if __name__ == '__main__':
         db_instance = DBSingleton.Instance()
         posts = db_instance.query(sql)
         retourner = render_template('interfacecontact.html', title=title, posts=posts)
-        #if request.method == "POST":
-          #  id = request.form['identerprise']
-           # sql = f"SELECT "
-            #print(sql)
-           # db_instance = DBSingleton.Instance()
-           # db_instance.query(sql)
-           # print('bon')
+        form = BarreDeRecherche()
+        if form.validate_on_submit():
+            recherche = request.form["filtre"]
+            sql = f"SELECT nom,email FROM personne WHERE nom OR email LIKE '{recherche}%'"
+            print(sql)
+            db_instance = DBSingleton.Instance()
+            db_instance.query(sql)
+            print('bon')
         return retourner
 
 
     @app.route('/modif-contact', methods=['POST', 'GET'])
     def modifcontact():
         title = 'formulaire'
-        idpersonne = session['personne']['id']
-        print(idpersonne)
-        sql = """SELECT  nom,prenom,email,poste,telephone,statut FROM personne"""
+        sql = """SELECT  personne.nom,prenom,email,poste,telephone,statut,entreprise.nom AS 'nom entreprise',idpersonne FROM personne JOIN entreprise ON entreprise_identreprise=entreprise.identreprise"""
         db_instance = DBSingleton.Instance()
         posts = db_instance.query(sql)
-        sql = f"SELECT * FROM personne WHERE idpersonne = {idpersonne}"
-        print(sql)
-        db_instance = DBSingleton.Instance()
-        tailles = db_instance.query(sql)
-        print(tailles)
         retourner = render_template('modifcontact.html', title=title, posts=posts)
-        if request.method == 'POST':
-            statut = request.form['statut']
-            try:
-                sql = f"""UPDATE personne
-                           SET statut = '{statut}', 
-                           WHERE idpersonne = {idpersonne};"""
-                db_instance = DBSingleton.Instance()
-                db_instance.query(sql)
-                print("good")
-                retourner = redirect("/admin-circuit")
-            except:
-                print("faux")
-        else:
-            retourner = redirect('/')
         return retourner
+
 
 
     @app.route('/com', methods=['POST', 'GET'])
@@ -198,5 +195,31 @@ if __name__ == '__main__':
         posts = db_instance.query(sql)
         retourner = render_template('interfacecom.html', title=title, posts=posts)
         return retourner
-#test
+    @app.route('/ajout-com', methods=['POST', 'GET'])
+    def ajoutcom():
+        title = 'formulaire'
+        sql = "SELECT auteur FROM commentaire"
+        db.query(sql, )
+        reponse = db.query(sql, )
+        if reponse == []:
+            print("pas d'entreprise donc pas de contacts")
+        else:
+            if request.method == 'POST':
+                auteur = request.form['auteur']
+                description = request.form['description']
+                date = request.form['date']
+                print(request.form)
+                contact = getidcontact(request.form['contact'])
+                record = (auteur, description, date, contact)
+                print(record)
+                try:
+                    sql = """INSERT INTO commentaire (auteur, description, dateDeCreation, personne_idpersonne) 
+                                                VALUES ('%s', '%s', '%s', '%s');""" % record
+                    db_instance = DBSingleton.Instance()
+                    db_instance.query(sql)
+                except:
+                    print('pas bon')
+            retourner = render_template('comForm.html')
+            return retourner
+
 app.run(debug=True)

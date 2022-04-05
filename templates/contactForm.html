@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf%}
+{% block content %}
+<form method="post" class="centrer">
+            <div>
+                <label> nom <input type="text" id="nom" name="nom"></label>
+            </div>
+            <div>
+                <label> prenom <input type="text" id="prenom" name="prenom"></label>
+            </div>
+            <div>
+                <label> email<input type="email" id="email" name="email"></label>
+            </div>
+            <div>
+                <label>numero de telephone <input type="text" id="telephone" name="telephone"></label>
+            </div>
+            <div>
+                <label>poste <input type="text" id="poste" name="poste"></label>
+            </div>
+            <p>Statut du contact</p>
+
+                <label>actif<input type="radio" class="boutonmerde" id="statut" name="statut" value="1"/></label>
+
+
+                <label>entreprise </label>
+                <select id="entreprise" name="entreprise">
+                    {% for value in reponses %}
+                        <option value="{{ value[0] }}">{{ value[0] }} {{ value[1] }}</option>
+                    {% endfor %}
+                </select>
+                <button class="button" type="submit">créer contact</button>
+            </div>
+        </form>
+{% endblock %}
+</body>

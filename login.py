@@ -26,7 +26,7 @@ def log():
     retourner = [None, None, None, cookie]
     if form.validate_on_submit():
         login = request.form.get('login')
-        MDP = request.form.get('motDePasse')
+        MDP = request.form.get('MDP')
         sql = f"SELECT login FROM utilisateur WHERE login = '{login}'"
         db_instance = DBSingleton.Instance()
         temp = db_instance.query(sql)
@@ -41,7 +41,7 @@ def log():
                 password = temp[0][0]
                 """mot de passe prit part le insert"""
                 if password == MDP:
-                    sql = f"SELECT id.utilisateur AS ID FROM utilisateur WHERE login = '{login}' AND motDePasse = '{MDP}'"
+                    sql = f"SELECT `id.utilisateur` AS ID FROM utilisateur WHERE login = '{login}' AND motDePasse = '{MDP}'"
                     db_instance = DBSingleton.Instance()
                     temp = db_instance.query(sql)
                     ID = temp[0][0]
@@ -53,16 +53,17 @@ def log():
                     print("pas bon mdp")
     return retourner
 
-def LogUser():
+
+def is_valid_session():
     cookie = log()
+    return cookie[3]
+
+def LogUser():
+
     form = authForm()
-    ID = cookie[0]
-    print(cookie)
-    session['user'] = {"info": cookie}
-    print(session['user']['info'])
     title = 'login'
     result = render_template('user.html', form=form, title=title)
-    if cookie[0] is True:
+    if is_valid_session():
         result = redirect('/user')
     return result
 

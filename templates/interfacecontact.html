@@ -5,6 +5,13 @@
 
 <div>
 
+    <div id="searchbar">
+                        <p>Recherche contact<p>
+        <form action="" class="formulaire">
+               <input class="champ" type="text" value="Recherche...)"/>
+                    <input class="bouton" type="button" value="Valider" />
+        </form>
+    </div>
     {% for post in posts %}
     <div class="table">
     <table>
@@ -15,8 +22,7 @@
             <th scope="col">Poste : {{ post[3] }}</th>
             <th scope="col">Telephone : {{ post[4] }}</th>
             <th scope="col">Statut : {{ post[5] }}</th>
-            <th scope="col">Url : {{ post[6] }}</th>
-            <th scope="col">Nombre de facture : {{ post[7] }}</th>
+            <th scope="col">Entreprise : {{ post[6] }}</th>
         </tr>
         <a href="/com"><input class="modif"
        type="button"
@@ -29,9 +35,9 @@
     <a href="/form"><input class="modif"
        type="button"
        value="Ajouter un nouveau contact"></a>
-    <a href="/del"><input class="modif"
+    <a href="/modif-contact"><input class="modif"
        type="button"
-       value="Supprimer un contact"></a>
+       value="Modifier un contact"></a>
 </div>
 <a href="/user"><input class="modif"
        type="button"

@@ -4,11 +4,12 @@
 {% block content %}
 
 <div>
-
-    {% for post in posts %}
     <div class="table">
     <table>
+    {% for post in posts %}
+
         <tr>
+
             <th scope="col">Nom : {{ post[0] }}</th>
             <th scope="col">Numero de Siret : {{ post[1] }}</th>
             <th scope="col">Adresse Postal : {{ post[2] }}</th>
@@ -16,11 +17,15 @@
             <th scope="col">Ville : {{ post[4] }}</th>
             <th scope="col">Description : {{ post[5] }}</th>
             <th scope="col">Url : {{ post[6] }}</th>
-            <th scope="col">ID : {{ post[7] }}</th>
+
+            <th scope="col">
+                <input type="radio" name="post_id" value="{{ post[7] }}">
+                ID : {{ post[7] }}</input></th>
         </tr>
+    {% endfor %}
+
     </table>
     </div>
-    {% endfor %}
 </div>
 <div>
     <a href="/form"><input class="modif"

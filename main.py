@@ -198,5 +198,5 @@ if __name__ == '__main__':
         posts = db_instance.query(sql)
         retourner = render_template('interfacecom.html', title=title, posts=posts)
         return retourner
-
+#test
 app.run(debug=True)

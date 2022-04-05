@@ -12,9 +12,10 @@
                     <input class="bouton" type="button" value="Valider" />
         </form>
     </div>
-    {% for post in posts %}
     <div class="table">
     <table>
+    {% for post in posts %}
+
         <tr>
             <th scope="col">Nom : {{ post[0] }}</th>
             <th scope="col">Prénom: {{ post[1] }}</th>
@@ -24,13 +25,15 @@
             <th scope="col">Statut : {{ post[5] }}</th>
             <th scope="col">Entreprise : {{ post[6] }}</th>
         </tr>
-        <a href="/com"><input class="modif"
-       type="button"
-       value="Voir les commentaires"></a>
+
+    {% endfor %}
     </table>
     </div>
-    {% endfor %}
 </div>
+<a href="/com"><input class="modif"
+       type="button"
+       value="Voir les commentaires"></a>
+
 <div>
     <a href="/form"><input class="modif"
        type="button"

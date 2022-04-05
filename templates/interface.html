@@ -4,10 +4,10 @@
 {% block content %}
 
 <div>
-
-    {% for post in posts %}
     <div class="table">
     <table>
+    {% for post in posts %}
+
         <tr>
             <th scope="col">Nom : {{ post[0] }}</th>
             <th scope="col">Numero de Siret : {{ post[1] }}</th>
@@ -18,13 +18,15 @@
             <th scope="col">Url : {{ post[6] }}</th>
             <th scope="col">Nombre de facture : {{ post[7] }}</th>
         </tr>
-        <a href="/contact"><input class="modif"
-       type="button"
-       value="Voir les contacts"></a>
+
+
+    {% endfor %}
     </table>
     </div>
-    {% endfor %}
 </div>
+<a href="/contact"><input class="modif"
+       type="button"
+       value="Voir les contacts"></a>
 <div>
     <a href="/form"><input class="modif"
        type="button"

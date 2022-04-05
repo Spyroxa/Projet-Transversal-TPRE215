@@ -4,6 +4,7 @@
 {% block content %}
 
 <div>
+    <form method="POST">
     <div class="table">
     <table>
     {% for post in posts %}
@@ -27,15 +28,15 @@
 
     </table>
     </div>
-</div>
+
 <div>
     <a href="/form"><input class="modif"
        type="button"
        value="Ajouter un nouveau prospect"></a>
-    <a href="/del"><input class="modif"
-       type="button"
-       value="Supprimer un prospect"></a>
+    <button class="button" type="submit">supprimer</button>
 </div>
+    </form>
+    </div>
 <a href="/user"><input class="modif"
        type="button"
        value="Accueil"></a>

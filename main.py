@@ -115,7 +115,7 @@ if __name__ == '__main__':
         return LogUser()
 
     @app.route('/user', methods=['POST', 'GET'])
-    def User():
+    def user():
         title = 'formulaire'
         sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,COUNT(numeroFacture) FROM entreprise LEFT JOIN facture ON identreprise = facture.entreprise_identreprise GROUP BY nom ORDER BY nom"""
         db_instance = DBSingleton.Instance()
@@ -125,14 +125,14 @@ if __name__ == '__main__':
 
 
     @app.route('/del', methods=['POST', 'GET'])
-    def delUser():
+    def deluser():
         title = 'formulaire'
         sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,identreprise FROM entreprise"""
         db_instance = DBSingleton.Instance()
         posts = db_instance.query(sql)
         retourner = render_template('delentreprise.html', title=title, posts=posts)
         if request.method == "POST":
-            id = request.form['identreprise']
+            identreprise = request.form['id']
             sql = f"DELETE FROM entreprise WHERE identreprise NOT IN (SELECT entreprise_identreprise FROM facture) AND identreprise = {id}"
             print(sql)
             db_instance = DBSingleton.Instance()
@@ -143,18 +143,24 @@ if __name__ == '__main__':
 
 
     @app.route('/contact', methods=['POST', 'GET'])
-    def Contact():
+    def contact():
         title = 'formulaire'
         sql = """SELECT  personne.nom,prenom,email,poste,telephone,statut,entreprise.nom AS 'nom entreprise' FROM personne JOIN entreprise ON entreprise_identreprise=entreprise.identreprise"""
         db_instance = DBSingleton.Instance()
         posts = db_instance.query(sql)
         retourner = render_template('interfacecontact.html', title=title, posts=posts)
-        #if
+        #if request.method == "POST":
+          #  id = request.form['identerprise']
+           # sql = f"SELECT "
+            #print(sql)
+           # db_instance = DBSingleton.Instance()
+           # db_instance.query(sql)
+           # print('bon')
         return retourner
 
 
     @app.route('/modif-contact', methods=['POST', 'GET'])
-    def modifContact():
+    def modifcontact():
         title = 'formulaire'
         idpersonne = session['personne']['id']
         print(idpersonne)
@@ -185,7 +191,7 @@ if __name__ == '__main__':
 
 
     @app.route('/com', methods=['POST', 'GET'])
-    def Commentaire():
+    def commentaire():
         title = 'formulaire'
         sql = """SELECT  auteur,description,dateDeCreation FROM commentaire ORDER BY dateDeCreation"""
         db_instance = DBSingleton.Instance()

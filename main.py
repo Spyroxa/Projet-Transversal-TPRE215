@@ -7,8 +7,6 @@ if __name__ == '__main__':
     db = DBSingleton.Instance()
     app.config['SECRET_KEY'] = 'this is not a secret'
 
-
-
     def verificationprospect(nom):
         lenom: tuple = (nom,)
         sql = "SELECT id FROM prospect WHERE nom = %s;"
@@ -100,7 +98,6 @@ if __name__ == '__main__':
     @app.route('/', methods=['POST', 'GET'])
     def appeLogin():
         return LogUser()
-
 
     @app.route('/user', methods=['POST', 'GET'])
     def user():

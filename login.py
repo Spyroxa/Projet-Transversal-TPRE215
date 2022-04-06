@@ -41,7 +41,7 @@ def log():
                 password = temp[0][0]
                 """mot de passe prit part le insert"""
                 if password == MDP:
-                    sql = f"SELECT `id.utilisateur` AS ID FROM utilisateur WHERE login = '{login}' AND motDePasse = '{MDP}'"
+                    sql = f"SELECT `idutilisateur` FROM utilisateur WHERE login = '{login}' AND motDePasse = '{MDP}'"
                     db_instance = DBSingleton.Instance()
                     temp = db_instance.query(sql)
                     ID = temp[0][0]

@@ -2,7 +2,7 @@ from PIL.XVThumbImagePlugin import g
 
 from imports import *
 from classes import *
-from flask import session
+from flask import session, g
 from flask_session import Session
 
 if __name__ == '__main__':
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     @app.route('/contact', methods=['POST', 'GET'])
     def contact():
         title = 'formulaire'
-        sql = """SELECT  contact.nom,prenom,email,poste,telephone,statut,prospect.nom AS 'nom prospect' FROM contact JOIN prospect ON prospect_idprospect=prospect.idprospect"""
+        sql = """SELECT  contact.nom,prenom,email,poste,telephone,CASE statut WHEN 1 then 'actif' WHEN 0 THEN 'inactif' END,prospect.nom AS 'nom prospect' FROM contact JOIN prospect ON prospect_idprospect=prospect.idprospect """
         db_instance = DBSingleton.Instance()
         posts = db_instance.query(sql)
         retourner = render_template('interfacecontact.html', title=title, posts=posts)

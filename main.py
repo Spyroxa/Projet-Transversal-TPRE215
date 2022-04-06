@@ -1,26 +1,13 @@
-from flask import Flask, render_template, url_for, Blueprint, session, request, redirect,send_file
-from flask_wtf import FlaskForm
-from flask_bootstrap import Bootstrap
-from wtforms import StringField, SubmitField, BooleanField, IntegerField, \
-    SelectField, DecimalField, DateField, EmailField
-from wtforms.validators import DataRequired, NumberRange
-from connectBDD import DBSingleton
-from insertion import ajouterEntreprise
-from login import LogUser,log,is_valid_session
-from visual import User
-from flask import render_template
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-
-
-
+from imports import *
+from classes import *
 
 if __name__ == '__main__':
     app = Flask(__name__)
     Bootstrap(app)
     db = DBSingleton.Instance()
     app.config['SECRET_KEY'] = 'this is not a secret'
+
+
 
     def verificationprospect(nom):
         lenom: tuple = (nom,)
@@ -40,34 +27,7 @@ if __name__ == '__main__':
         else:
              return True
 
-    class FormulaireCreationprospect(FlaskForm):
 
-        nom = StringField("Nom du prospect", validators=[DataRequired()])
-        numSiret = StringField("Numero de siret", validators=[DataRequired()])
-        adressePostale = StringField("Adresse principale du prospect", validators=[DataRequired()])
-        codePostal = StringField("Code postal", validators=[DataRequired()])
-        ville = StringField("Ville de location", validators=[DataRequired()])
-        description = StringField("Description du prospect", )
-        url = StringField("Url du site", )
-        valider = SubmitField('Valider')
-
-
-    class FormulaireCreationContact(FlaskForm):
-        nom = StringField("Nom du contact", validators=[DataRequired()])
-        prenom = StringField("Prenom du contact", validators=[DataRequired()])
-        email = EmailField ("Email du contact", validators=[DataRequired()])
-        poste = StringField("Prenom du contact", validators=[DataRequired()])
-        valider = SubmitField('Valider')
-
-    class FormulaireCreationCom(FlaskForm):
-        auteur = StringField("Auteur", validators=[DataRequired()])
-        description = StringField("Description du prospect",validators=[DataRequired()])
-        date = DateField("Date du commentaire",validators=[DataRequired()])
-        valider = SubmitField('Valider')
-
-    class BarreDeRecherche(FlaskForm):
-        filtre = StringField("Nom du contact", validators=[DataRequired()])
-        valider = SubmitField('Valider')
 
     @app.route('/form', methods=['GET', 'POST'])
     def ajoutprospect():
@@ -140,6 +100,7 @@ if __name__ == '__main__':
     @app.route('/', methods=['POST', 'GET'])
     def appeLogin():
         return LogUser()
+
 
     @app.route('/user', methods=['POST', 'GET'])
     def user():

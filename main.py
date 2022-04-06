@@ -1,20 +1,30 @@
+import flask
+import flask_login
 from PIL.XVThumbImagePlugin import g
 
 from imports import *
 from classes import *
+from datetime import timedelta
 from flask import session, g
 from flask_session import Session
+from flask_login import LoginManager, login_required, login_user, logout_user
 
 if __name__ == '__main__':
     app = Flask(__name__)
     app.secret_key = 'super secret key'
-
     app.config['SESSION_TYPE'] = 'filesystem'
     Bootstrap(app)
     app.config.from_object(__name__)
     Session(app)
+    app.permanent_session_lifetime = timedelta(minutes=60)
     db = DBSingleton.Instance()
     app.config['SECRET_KEY'] = 'this is not a secret'
+    @app.before_request
+    def before_request():
+        session.permanent = True
+        app.permanent_session_lifetime = timedelta(minutes=60)
+        flask.session.modified = True
+        flask.g.user = flask_login.current_user
 
     def verificationprospect(nom):
         lenom: tuple = (nom,)
@@ -38,7 +48,7 @@ if __name__ == '__main__':
 
     @app.route('/form', methods=['GET', 'POST'])
     def ajoutprospect():
-        if is_valid_session:
+        if 'user' in session:
             form = FormulaireCreationprospect()
             if form.validate_on_submit():
                 params: tuple = (
@@ -51,7 +61,9 @@ if __name__ == '__main__':
                 print("ça marche")
             else:
                 print(" ça marche pas")
-
+        else:
+            retourner = redirect('/')
+            return retourner
         return render_template('login.html', form=form)
 
 
@@ -76,7 +88,7 @@ if __name__ == '__main__':
     @app.route('/ajout-contact', methods=['GET', 'POST'])
     def ajoutContact():
         print(session['key'])
-        if is_valid_session:
+        if 'user' in session:
             sql = "SELECT idprospect, nom FROM prospect"
             db.query(sql, )
             reponse = db.query(sql, )
@@ -98,8 +110,10 @@ if __name__ == '__main__':
                     db_instance.query(sql)
                 except:
                     print('pas bon')
-            retourner = render_template('ajoutcontact.html', reponses=reponse)
-        return retourner
+        else:
+            retourner = redirect('/')
+            return retourner
+        return render_template('ajoutcontact.html', reponses=reponse)
 
 
     @app.route('/', methods=['POST', 'GET'])
@@ -110,117 +124,134 @@ if __name__ == '__main__':
     @app.route('/logout')
     def logout():
         session.clear()
-        return redirect(url_for('user'))
+        return redirect('/')
     @app.route('/user', methods=['POST', 'GET'])
     def user():
-        if is_valid_session:
+        if 'user' in session:
             title = 'formulaire'
             sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,COUNT(numeroFacture) FROM prospect LEFT JOIN facture ON idprospect = facture.prospect_idprospect GROUP BY nom ORDER BY nom"""
             db_instance = DBSingleton.Instance()
             posts = db_instance.query(sql)
             retourner = render_template('interface.html', title=title, posts=posts)
+        else:
+            retourner = redirect('/')
         return retourner
 
 
     @app.route('/del', methods=['POST', 'GET'])
     def deluser():
-        title = 'formulaire'
-        sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,idprospect,COUNT(numeroFacture) FROM prospect LEFT JOIN facture ON idprospect = facture.prospect_idprospect GROUP BY nom ORDER BY nom"""
-        db_instance = DBSingleton.Instance()
-        posts = db_instance.query(sql)
-        retourner = render_template('delentreprise.html', title=title, posts=posts)
-        if request.method == "POST":
-            ID = request.form['post_id']
-            sql = f"DELETE FROM prospect WHERE idprospect NOT IN (SELECT prospect_idprospect FROM facture) AND idprospect = {ID}"
-            print(sql)
+        if 'user' in session:
+            title = 'formulaire'
+            sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,idprospect,COUNT(numeroFacture) FROM prospect LEFT JOIN facture ON idprospect = facture.prospect_idprospect GROUP BY nom ORDER BY nom"""
             db_instance = DBSingleton.Instance()
-            db_instance.query(sql)
-            print('bon')
-            retourner = redirect('/user')
+            posts = db_instance.query(sql)
+            retourner = render_template('delentreprise.html', title=title, posts=posts)
+            if request.method == "POST":
+                ID = request.form['post_id']
+                sql = f"DELETE FROM prospect WHERE idprospect NOT IN (SELECT prospect_idprospect FROM facture) AND idprospect = {ID}"
+                print(sql)
+                db_instance = DBSingleton.Instance()
+                db_instance.query(sql)
+                print('bon')
+                retourner = redirect('/user')
+        else:
+            retourner = redirect('/')
         return retourner
 
 
     @app.route('/contact', methods=['POST', 'GET'])
     def contact():
-        title = 'formulaire'
-        sql = """SELECT  contact.nom,prenom,email,poste,telephone,CASE statut WHEN 1 then 'actif' WHEN 0 THEN 'inactif' END,prospect.nom AS 'nom prospect' FROM contact JOIN prospect ON prospect_idprospect=prospect.idprospect """
-        db_instance = DBSingleton.Instance()
-        posts = db_instance.query(sql)
-        retourner = render_template('interfacecontact.html', title=title, posts=posts)
-        form = BarreDeRecherche()
-        #essai de la barre de recherche
-        if form.validate_on_submit():
-            recherche = request.form["filtre"]
-            sql = f"SELECT nom,email FROM contact WHERE nom OR email LIKE '{recherche}%'"
-            print(sql)
+        if 'user' in session:
+            title = 'formulaire'
+            sql = """SELECT  contact.nom,prenom,email,poste,telephone,CASE statut WHEN 1 then 'actif' WHEN 0 THEN 'inactif' END,prospect.nom AS 'nom prospect' FROM contact JOIN prospect ON prospect_idprospect=prospect.idprospect """
             db_instance = DBSingleton.Instance()
-            db_instance.query(sql)
-            print('bon')
+            posts = db_instance.query(sql)
+            retourner = render_template('interfacecontact.html', title=title, posts=posts)
+            form = BarreDeRecherche()
+        #essai de la barre de recherche
+            if form.validate_on_submit():
+                recherche = request.form["filtre"]
+                sql = f"SELECT nom,email FROM contact WHERE nom OR email LIKE '{recherche}%'"
+                print(sql)
+                db_instance = DBSingleton.Instance()
+                db_instance.query(sql)
+                print('bon')
+        else:
+            retourner = redirect('/')
         return retourner
 
 
     @app.route('/editer-contact', methods=['GET', 'POST'])
     def modifContact():
-        sql = "SELECT idprospect, nom FROM prospect"
-        db.query(sql, )
-        nom_prospet = db.query(sql, )
-        sql2 = "SELECT idcontacct, nom FROM contact"
-        db.query(sql2, )
-        nom_contact = db.query(sql2)
-        retourner = render_template('contactForm.html', reponses=nom_prospet, choices=nom_contact)
-        if request.method == 'POST':
-            modified = request.form['id']
-            nom = request.form['nom']
-            prenom = request.form['prenom']
-            email = request.form['email']
-            poste = request.form['poste']
-            telephone = request.form['telephone']
-            actif = 1 if 'statut' in request.form else 0
-            prospect = request.form['prospect']
-            sql = f"""UPDATE contact SET nom = '{nom}', prenom = '{prenom}', email = '{email}',
-                      poste = '{poste}', telephone = {telephone}, statut = {actif},
-                      prospect_idprospect = {prospect} WHERE idcontacct ={modified}"""
-            print(sql)
-            db_instance = DBSingleton.Instance()
-            db_instance.query(sql)
+        if 'user' in session:
+            sql = "SELECT idprospect, nom FROM prospect"
+            db.query(sql, )
+            nom_prospet = db.query(sql, )
+            sql2 = "SELECT idcontacct, nom FROM contact"
+            db.query(sql2, )
+            nom_contact = db.query(sql2)
+            retourner = render_template('contactForm.html', reponses=nom_prospet, choices=nom_contact)
+            if request.method == 'POST':
+                modified = request.form['id']
+                nom = request.form['nom']
+                prenom = request.form['prenom']
+                email = request.form['email']
+                poste = request.form['poste']
+                telephone = request.form['telephone']
+                actif = 1 if 'statut' in request.form else 0
+                prospect = request.form['prospect']
+                sql = f"""UPDATE contact SET nom = '{nom}', prenom = '{prenom}', email = '{email}',
+                          poste = '{poste}', telephone = {telephone}, statut = {actif},
+                          prospect_idprospect = {prospect} WHERE idcontacct ={modified}"""
+                print(sql)
+                db_instance = DBSingleton.Instance()
+                db_instance.query(sql)
+        else:
+            retourner = redirect('/')
         return retourner
 
 
 
     @app.route('/com', methods=['POST', 'GET'])
     def commentaire():
-        title = 'formulaire'
-        sql = """SELECT  auteur,description,dateDeCreation FROM commentaire ORDER BY dateDeCreation"""
-        db_instance = DBSingleton.Instance()
-        posts = db_instance.query(sql)
-        retourner = render_template('interfacecom.html', title=title, posts=posts)
+        if 'user' in session:
+            title = 'formulaire'
+            sql = """SELECT  auteur,description,dateDeCreation FROM commentaire ORDER BY dateDeCreation"""
+            db_instance = DBSingleton.Instance()
+            posts = db_instance.query(sql)
+            retourner = render_template('interfacecom.html', title=title, posts=posts)
+        else:
+            retourner = redirect('/')
         return retourner
     @app.route('/ajout-com', methods=['POST', 'GET'])
     def ajoutcom():
-        title = 'formulaire'
-        sql = "SELECT auteur FROM commentaire"
-        db.query(sql, )
-        reponse = db.query(sql, )
-        if request.method == 'POST':
-            auteur = request.form['auteur']
-            description = request.form['description']
-            date = request.form['date']
-            print(request.form)
-            record = (auteur, description, date)
-            print(record)
-            try:
-                sql = """INSERT INTO commentaire (auteur, description, dateDeCreation) 
-                                            VALUES ('%s', '%s', '%s');""" % record
-                db_instance = DBSingleton.Instance()
-                db_instance.query(sql)
-            except:
-                print('pas bon')
-        retourner = render_template('comForm.html')
+        if 'user' in session:
+            title = 'formulaire'
+            sql = "SELECT auteur FROM commentaire"
+            db.query(sql, )
+            reponse = db.query(sql, )
+            if request.method == 'POST':
+                auteur = request.form['auteur']
+                description = request.form['description']
+                date = request.form['date']
+                print(request.form)
+                record = (auteur, description, date)
+                print(record)
+                try:
+                    sql = """INSERT INTO commentaire (auteur, description, dateDeCreation) 
+                                                VALUES ('%s', '%s', '%s');""" % record
+                    db_instance = DBSingleton.Instance()
+                    db_instance.query(sql)
+                except:
+                    print('pas bon')
+            retourner = render_template('comForm.html')
+        else:
+            retourner = redirect('/')
         return retourner
 
     @app.route('/ajout-facture', methods=['POST', 'GET'])
     def ajoutfacture():
-        if is_valid_session:
+        if 'user' in session:
             sql = "SELECT idprospect, nom FROM prospect"
             db.query(sql, )
             nom_prospect = db.query(sql, )
@@ -240,15 +271,19 @@ if __name__ == '__main__':
                          VALUES ('%s', '%s', '%s', '%s');""" % record
                 db_instance = DBSingleton.Instance()
                 db_instance.query(sql)
-
-            return retourner
+        else:
+            retourner = redirect('/')
+        return retourner
     @app.route('/facture', methods=['POST', 'GET'])
     def facture():
-        title = 'formulaire'
-        sql = """SELECT  prenom,contact.nom,dateFacture,numeroFacture,prospect.nom AS 'nom prospect',email,telephone,prenom FROM facture JOIN prospect ON prospect_idprospect=prospect.idprospect JOIN contact ON personne_idcontact=contact.idcontacct"""
-        db_instance = DBSingleton.Instance()
-        posts = db_instance.query(sql)
-        retourner = render_template('interfacefacture.html', title=title, posts=posts)
+        if 'user' in session:
+            title = 'formulaire'
+            sql = """SELECT  prenom,contact.nom,dateFacture,numeroFacture,prospect.nom AS 'nom prospect',email,telephone,prenom FROM facture JOIN prospect ON prospect_idprospect=prospect.idprospect JOIN contact ON personne_idcontact=contact.idcontacct"""
+            db_instance = DBSingleton.Instance()
+            posts = db_instance.query(sql)
+            retourner = render_template('interfacefacture.html', title=title, posts=posts)
+        else:
+            retourner = redirect('/')
         return retourner
 
 

@@ -100,7 +100,7 @@ body {
       width:48%;
       }
       input[type="date"]::-webkit-inner-spin-button {
-      display: none;
+        display: inline
       }
       .item i, input[type="date"]::-webkit-calendar-picker-indicator {
       position: absolute;
@@ -112,6 +112,9 @@ body {
       top: 30px;
       z-index: 1;
       }
+      .boutondemerde{
+      display: inline
+      }
       input[type=radio], input[type=checkbox]  {
 
       }
@@ -120,6 +123,10 @@ body {
       display: inline-block;
       margin: 5px 20px 15px 0;
       cursor: pointer;
+      }
+      .boutondemerde{
+      font-size : 10vh
+      opacity : 1
       }
       .question span {
       margin-left: 30px;

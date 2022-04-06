@@ -1,0 +1,7 @@
+ { %extends 'contactForm.html' % }
+<label>Qui modifiez-vous?</label>
+                <select id="id" name="id">
+                    {% for value in reponses %}
+                        <option value="{{ value[0] }}">{{ value[0] }} {{ value[1] }}</option>
+                    {% endfor %}
+                </select>

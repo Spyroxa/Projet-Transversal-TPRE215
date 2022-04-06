@@ -19,24 +19,33 @@ if __name__ == '__main__':
     db = DBSingleton.Instance()
     app.config['SECRET_KEY'] = 'this is not a secret'
 
-    def verificationEntreprise(nom):
+    def verificationprospect(nom):
         lenom: tuple = (nom,)
-        sql = "SELECT id FROM entreprise WHERE nom = %s;"
+        sql = "SELECT id FROM prospect WHERE nom = %s;"
         db.query(sql, lenom)
         if db.result == []:
             return False
         else:
             return True
 
-    class FormulaireCreationEntreprise(FlaskForm):
+    def verificationContactDejaExistant(nom):
+        contact: tuple = (nom,)
+        sql = "SELECT nom FROM contact WHERE nom = %s;"
+        reponse = db.query(sql, contact)
+        if reponse == []:
+             return False
+        else:
+             return True
 
-        nom = StringField("Nom de l'entreprise", validators=[DataRequired()])
+    class FormulaireCreationprospect(FlaskForm):
+
+        nom = StringField("Nom du prospect", validators=[DataRequired()])
         numSiret = StringField("Numero de siret", validators=[DataRequired()])
-        adressePostale = StringField("Adresse principale de l'entreprise", validators=[DataRequired()])
+        adressePostale = StringField("Adresse principale du prospect", validators=[DataRequired()])
         codePostal = StringField("Code postal", validators=[DataRequired()])
         ville = StringField("Ville de location", validators=[DataRequired()])
-        description = StringField("Description de l'entreprise", )
-        url = StringField("Url du site" , )
+        description = StringField("Description du prospect", )
+        url = StringField("Url du site", )
         valider = SubmitField('Valider')
 
 
@@ -49,7 +58,7 @@ if __name__ == '__main__':
 
     class FormulaireCreationCom(FlaskForm):
         auteur = StringField("Auteur", validators=[DataRequired()])
-        description = StringField("Description de l'entreprise",validators=[DataRequired()])
+        description = StringField("Description du prospect",validators=[DataRequired()])
         date = DateField("Date du commentaire",validators=[DataRequired()])
         valider = SubmitField('Valider')
 
@@ -58,16 +67,16 @@ if __name__ == '__main__':
         valider = SubmitField('Valider')
 
     @app.route('/form', methods=['GET', 'POST'])
-    def ajoutEntreprise():
+    def ajoutprospect():
         if is_valid_session:
-            form = FormulaireCreationEntreprise()
+            form = FormulaireCreationprospect()
             if form.validate_on_submit():
                 params: tuple = (
                 form.nom.data, form.numSiret.data, form.adressePostale.data,
                 form.codePostal.data, form.ville.data,
                 form.description.data, form.url.data)
 
-                sql = "INSERT INTO entreprise (nom, NSiret, adressePostale, codePostal, ville, description, url) VALUES (%s,%s,%s,%s,%s,%s,%s); "
+                sql = "INSERT INTO prospect (nom, NSiret, adressePostale, codePostal, ville, description, url) VALUES (%s,%s,%s,%s,%s,%s,%s); "
                 db.query(sql, params)
                 print("ça marche")
             else:
@@ -80,28 +89,28 @@ if __name__ == '__main__':
         return str(tuple).strip("(),")
 
 
-    def getidentreprise(nom):
+    def getidprospect(nom):
         tab: tuple = (nom,)
-        sql = "SELECT identreprise FROM entreprise WHERE nom = %s;"
+        sql = "SELECT idprospect FROM prospect WHERE nom = %s;"
         reponse = db.query(sql, tab)
-        identreprise = reponse[0]
-        return stringer(identreprise)
+        idprospect = reponse[0]
+        return stringer(idprospect)
 
     def getidcontact(nom):
         tab: tuple = (nom,)
-        sql = "SELECT idpersonne FROM personne WHERE nom = %s;"
+        sql = "SELECT idcontact FROM contact WHERE nom = %s;"
         reponse = db.query(sql, tab)
-        idpersonne = reponse[0]
-        return stringer(idpersonne)
+        idcontact = reponse[0]
+        return stringer(idcontact)
 
     @app.route('/ajout-contact', methods=['GET', 'POST'])
     def ajoutContact():
         if is_valid_session:
-            sql = "SELECT nom FROM entreprise"
+            sql = "SELECT nom FROM prospect"
             db.query(sql, )
             reponse = db.query(sql, )
             if reponse == []:
-                print("pas d'entreprise donc pas de contacts")
+                print("pas de prospect donc pas de contacts")
             else:
                 if request.method == 'POST':
                     nom = request.form['nom']
@@ -111,11 +120,11 @@ if __name__ == '__main__':
                     telephone = request.form['telephone']
                     print(request.form)
                     actif = 1 if 'statut' in request.form else 0
-                    entreprise = getidentreprise(request.form['entreprise'])
-                    record = (nom, prenom, email, poste, telephone, actif, entreprise)
+                    prospect = getidprospect(request.form['prospect'])
+                    record = (nom, prenom, email, poste, telephone, actif, prospect)
                     print(record)
                     try:
-                        sql = """INSERT INTO personne (nom, prenom, email, poste, telephone, statut, entreprise_identreprise) 
+                        sql = """INSERT INTO contact (nom, prenom, email, poste, telephone, statut, prospect_idprospect) 
                                     VALUES ('%s', '%s', '%s', '%s', %s, '%s', %s);""" % record
                         db_instance = DBSingleton.Instance()
                         db_instance.query(sql)
@@ -133,7 +142,7 @@ if __name__ == '__main__':
     def user():
         if is_valid_session:
             title = 'formulaire'
-            sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,COUNT(numeroFacture) FROM entreprise LEFT JOIN facture ON identreprise = facture.entreprise_identreprise GROUP BY nom ORDER BY nom"""
+            sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,COUNT(numeroFacture) FROM prospect LEFT JOIN facture ON idprospect = facture.prospect_idprospect GROUP BY nom ORDER BY nom"""
             db_instance = DBSingleton.Instance()
             posts = db_instance.query(sql)
             retourner = render_template('interface.html', title=title, posts=posts)
@@ -143,13 +152,13 @@ if __name__ == '__main__':
     @app.route('/del', methods=['POST', 'GET'])
     def deluser():
         title = 'formulaire'
-        sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,identreprise,COUNT(numeroFacture) FROM entreprise LEFT JOIN facture ON identreprise = facture.entreprise_identreprise GROUP BY nom ORDER BY nom"""
+        sql = """SELECT nom,NSiret,adressePostale,codePostal,ville,description,url,idprospect,COUNT(numeroFacture) FROM prospect LEFT JOIN facture ON idprospect = facture.prospect_idprospect GROUP BY nom ORDER BY nom"""
         db_instance = DBSingleton.Instance()
         posts = db_instance.query(sql)
         retourner = render_template('delentreprise.html', title=title, posts=posts)
         if request.method == "POST":
             ID = request.form['post_id']
-            sql = f"DELETE FROM entreprise WHERE identreprise NOT IN (SELECT entreprise_identreprise FROM facture) AND identreprise = {ID}"
+            sql = f"DELETE FROM prospect WHERE idprospect NOT IN (SELECT prospect_idprospect FROM facture) AND idprospect = {ID}"
             print(sql)
             db_instance = DBSingleton.Instance()
             db_instance.query(sql)
@@ -161,14 +170,14 @@ if __name__ == '__main__':
     @app.route('/contact', methods=['POST', 'GET'])
     def contact():
         title = 'formulaire'
-        sql = """SELECT  personne.nom,prenom,email,poste,telephone,statut,entreprise.nom AS 'nom entreprise' FROM personne JOIN entreprise ON entreprise_identreprise=entreprise.identreprise"""
+        sql = """SELECT  contact.nom,prenom,email,poste,telephone,statut,prospect.nom AS 'nom prospect' FROM contact JOIN prospect ON prospect_idprospect=prospect.idprospect"""
         db_instance = DBSingleton.Instance()
         posts = db_instance.query(sql)
         retourner = render_template('interfacecontact.html', title=title, posts=posts)
         form = BarreDeRecherche()
         if form.validate_on_submit():
             recherche = request.form["filtre"]
-            sql = f"SELECT nom,email FROM personne WHERE nom OR email LIKE '{recherche}%'"
+            sql = f"SELECT nom,email FROM contact WHERE nom OR email LIKE '{recherche}%'"
             print(sql)
             db_instance = DBSingleton.Instance()
             db_instance.query(sql)
@@ -176,14 +185,28 @@ if __name__ == '__main__':
         return retourner
 
 
-    @app.route('/modif-contact', methods=['POST', 'GET'])
-    def modifcontact():
-        title = 'formulaire'
-        sql = """SELECT  personne.nom,prenom,email,poste,telephone,statut,entreprise.nom AS 'nom entreprise',idpersonne FROM personne JOIN entreprise ON entreprise_identreprise=entreprise.identreprise"""
-        db_instance = DBSingleton.Instance()
-        posts = db_instance.query(sql)
-        retourner = render_template('modifcontact.html', title=title, posts=posts)
-        return retourner
+    @app.route('/editer-contact', methods=['GET', 'POST'])
+    def modifContact():
+        sql = "SELECT nom FROM contact"
+        db.query(sql, )
+        reponse = db.query(sql, )
+        if verificationContactDejaExistant(reponse) == True:
+            if request.method == 'POST':
+                nom = request.form['nom']
+                prenom = request.form['prenom']
+                email = request.form['email']
+                poste = request.form['poste']
+                telephone = request.form['telephone']
+                actif = 1 if 'statut' in request.form else 0
+                prospect = getidprospect(request.form['prospect'])
+                record = (nom, prenom, email, poste, telephone, actif, prospect)
+            sql = "UPDATE contact SET nom = '%s', prenom = '%s', email = '%s', " \
+                  "poste = '%s', telephone = %s, actif = %s, " \
+                  "prospect = '%s',  " % record
+            db_instance = DBSingleton.Instance()
+            db_instance.query(sql)
+            retourner = render_template('contactForm.html', reponses=reponse)
+            return retourner
 
 
 
@@ -202,7 +225,7 @@ if __name__ == '__main__':
         db.query(sql, )
         reponse = db.query(sql, )
         if reponse == []:
-            print("pas d'entreprise donc pas de contacts")
+            print("pas d'prospect donc pas de contacts")
         else:
             if request.method == 'POST':
                 auteur = request.form['auteur']
@@ -213,7 +236,7 @@ if __name__ == '__main__':
                 record = (auteur, description, date, contact)
                 print(record)
                 try:
-                    sql = """INSERT INTO commentaire (auteur, description, dateDeCreation, personne_idpersonne) 
+                    sql = """INSERT INTO commentaire (auteur, description, dateDeCreation, contact_idcontact) 
                                                 VALUES ('%s', '%s', '%s', '%s');""" % record
                     db_instance = DBSingleton.Instance()
                     db_instance.query(sql)

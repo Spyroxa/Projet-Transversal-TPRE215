@@ -19,7 +19,8 @@
             </div>
             <p>Statut du contact</p>
 
-                <label>actif<input type="radio" class="boutonmerde" id="statut" name="statut" value="1"/></label>
+                <label>actif</label>
+                <input type="radio" class="boutonmerde" id="statut" name="statut" value="1"/>
 
 
                 <label>entreprise </label>
@@ -28,12 +29,9 @@
                         <option value="{{ value[0] }}">{{ value[0] }} {{ value[1] }}</option>
                     {% endfor %}
                 </select>
+
                 <button class="button" type="submit">créer contact</button>
-            <a href="/user"><input class="modif"
-       type="button"
-       value="Accueil"></a>
             </div>
         </form>
-
 {% endblock %}
 </body>

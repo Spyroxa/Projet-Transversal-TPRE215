@@ -1,3 +1,5 @@
+from PIL.XVThumbImagePlugin import g
+
 from imports import *
 from classes import *
 from flask import session
@@ -105,10 +107,10 @@ if __name__ == '__main__':
         session['key'] = 'value'
         return LogUser()
 
-
     @app.route('/logout')
     def logout():
-        return 'Logout'
+        session.clear()
+        return redirect(url_for('user'))
     @app.route('/user', methods=['POST', 'GET'])
     def user():
         if is_valid_session:
@@ -243,7 +245,7 @@ if __name__ == '__main__':
     @app.route('/facture', methods=['POST', 'GET'])
     def facture():
         title = 'formulaire'
-        sql = """SELECT  contact.nom,dateFacture,numeroFacture,prospect.nom AS 'nom prospect' FROM facture JOIN prospect ON prospect_idprospect=prospect.idprospect JOIN contact ON personne_idcontact=contact.idcontacct"""
+        sql = """SELECT  prenom,contact.nom,dateFacture,numeroFacture,prospect.nom AS 'nom prospect',email,telephone,prenom FROM facture JOIN prospect ON prospect_idprospect=prospect.idprospect JOIN contact ON personne_idcontact=contact.idcontacct"""
         db_instance = DBSingleton.Instance()
         posts = db_instance.query(sql)
         retourner = render_template('interfacefacture.html', title=title, posts=posts)

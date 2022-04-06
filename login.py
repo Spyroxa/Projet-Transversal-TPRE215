@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, session
+from flask import Flask, render_template, redirect, url_for, flash, request, session, g
 from flask_wtf import FlaskForm
 from flask_bootstrap import Bootstrap
 from wtforms import StringField, SubmitField, BooleanField, IntegerField, SelectField, DecimalField, PasswordField, \
@@ -23,6 +23,7 @@ class authForm(FlaskForm):
 def log():
     form = authForm()
     cookie = False
+    # session['user'] = {'login' : {login}, 'MDP' : {MDP}}
     retourner = [None, None, None, cookie]
     if form.validate_on_submit():
         login = request.form.get('login')

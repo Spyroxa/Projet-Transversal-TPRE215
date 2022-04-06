@@ -41,7 +41,6 @@ if __name__ == '__main__':
              return True
 
     class FormulaireCreationprospect(FlaskForm):
-
         nom = StringField("Nom du prospect", validators=[DataRequired()])
         numSiret = StringField("Numero de siret", validators=[DataRequired()])
         adressePostale = StringField("Adresse principale du prospect", validators=[DataRequired()])
@@ -78,7 +77,6 @@ if __name__ == '__main__':
                 form.nom.data, form.numSiret.data, form.adressePostale.data,
                 form.codePostal.data, form.ville.data,
                 form.description.data, form.url.data)
-
                 sql = "INSERT INTO prospect (nom, NSiret, adressePostale, codePostal, ville, description, url) VALUES (%s,%s,%s,%s,%s,%s,%s); "
                 db.query(sql, params)
                 print("ça marche")
@@ -101,13 +99,13 @@ if __name__ == '__main__':
 
     def getidcontact(nom):
         tab: tuple = (nom,)
-        sql = "SELECT idcontact FROM contact WHERE nom = %s;"
+        sql = "SELECT idcontacct FROM contact WHERE nom = %s;"
         reponse = db.query(sql, tab)
         idcontact = reponse[0]
         return stringer(idcontact)
 
     @app.route('/ajout-contact', methods=['GET', 'POST'])
-    def ajoutContact():
+    def ajoutcontact():
         if is_valid_session:
             sql = "SELECT nom FROM prospect"
             db.query(sql, )
@@ -133,7 +131,7 @@ if __name__ == '__main__':
                         db_instance.query(sql)
                     except:
                         print('pas bon')
-            retourner = render_template('contactForm.html', reponses=reponse)
+            retourner = render_template('ajoutcontact.html', reponses=reponse)
         return retourner
 
 
@@ -193,7 +191,7 @@ if __name__ == '__main__':
         sql = "SELECT idprospect, nom FROM prospect"
         db.query(sql, )
         nom_prospet = db.query(sql, )
-        sql2 = "SELECT idcontact, nom FROM contact"
+        sql2 = "SELECT idcontacct, nom FROM contact"
         db.query(sql2, )
         nom_contact = db.query(sql2)
         retourner = render_template('contactForm.html', reponses=nom_prospet, choices=nom_contact)
@@ -208,7 +206,7 @@ if __name__ == '__main__':
             prospect = request.form['prospect']
             sql = f"""UPDATE contact SET nom = '{nom}', prenom = '{prenom}', email = '{email}',
                       poste = '{poste}', telephone = {telephone}, statut = {actif},
-                      prospect_idprospect = {prospect} WHERE idcontact ={modified}"""
+                      prospect_idprospect = {prospect} WHERE idcontacct ={modified}"""
             print(sql)
             db_instance = DBSingleton.Instance()
             db_instance.query(sql)
@@ -227,23 +225,17 @@ if __name__ == '__main__':
     @app.route('/ajout-com', methods=['POST', 'GET'])
     def ajoutcom():
         title = 'formulaire'
-        sql = "SELECT auteur FROM commentaire"
-        db.query(sql, )
-        reponse = db.query(sql, )
-        if reponse == []:
-            print("pas d'prospect donc pas de contacts")
-        else:
-            if request.method == 'POST':
+        if request.method == 'POST':
                 auteur = request.form['auteur']
                 description = request.form['description']
                 date = request.form['date']
                 print(request.form)
-                contact = getidcontact(request.form['contact'])
-                record = (auteur, description, date, contact)
+                #contact = getidcontact(request.form['contact'])
+                record = (auteur, description, date)
                 print(record)
                 try:
-                    sql = """INSERT INTO commentaire (auteur, description, dateDeCreation, contact_idcontact) 
-                                                VALUES ('%s', '%s', '%s', '%s');""" % record
+                    sql = """INSERT INTO commentaire (auteur, description, dateDeCreation) 
+                                                VALUES ('%s', '%s', '%s');""" % record
                     db_instance = DBSingleton.Instance()
                     db_instance.query(sql)
                 except:
@@ -254,32 +246,32 @@ if __name__ == '__main__':
 
 
     # @app.route('/pdf/<facture_id>')
-    #     def display_pdf(facture_id):
-    #             return send_file('canvas_form.pdf', attachment_filename='file.pdf')
-    #
+    # def display_pdf(facture_id):
+    #         return send_file('canvas_form.pdf', attachment_filename='file.pdf')
+    # #
     # @app.route('/facture', methods=['POST', 'GET'])
-    #     def form(path, prospect_nom, nom_contact):
-    #         my_canvas = canvas.Canvas(path, pagesize=letter)
-    #         my_canvas.setLineWidth(.4)
-    #         my_canvas.setFont('Helvetica', 12)
-    #         my_canvas.drawString(30, 750, 'La jolie boite à code')
-    #         my_canvas.drawString(30, 715, 'adresse : ')
-    #         my_canvas.drawString(400, 680, 'FACTURE:')
-    #         my_canvas.drawString(30, 700, 'adresse entreprise:')
-    #         my_canvas.drawString(30, 640, 'N° de SIREN:')
-    #         my_canvas.drawString(30, 590, f'Tel. :{prospect_nom}')
-    #         my_canvas.drawString(30, 570, 'Email:')
-    #         my_canvas.drawString(30, 550, 'IBAN:')
-    #         my_canvas.drawString(30, 470, f'Numéro {nom_contact}:')
-    #         my_canvas.drawString(160, 470, f'Date {nom_contact}:')
-    #         my_canvas.drawString(350, 520, f'Nom du prospect : {prospect_nom} ')
-    #         my_canvas.drawString(350, 500, f'Nom du contact : {nom_contact}')
-    #         my_canvas.drawString(350, 480, f'Adresse du prospect :{prospect_nom}')
-    #         my_canvas.drawString(350, 460, f'Code et Ville du prospect :{prospect_nom}')
-    #         my_canvas.save()
+    # def form(path, prospect_nom, nom_contact):
+    #     my_canvas = canvas.Canvas(path, pagesize=letter)
+    #     my_canvas.setLineWidth(.4)
+    #     my_canvas.setFont('Helvetica', 12)
+    #     my_canvas.drawString(30, 750, 'La jolie boite à code')
+    #     my_canvas.drawString(30, 715, 'adresse : ')
+    #     my_canvas.drawString(400, 680, 'FACTURE:')
+    #     my_canvas.drawString(30, 700, 'adresse entreprise:')
+    #     my_canvas.drawString(30, 640, 'N° de SIREN:')
+    #     my_canvas.drawString(30, 590, f'Tel. :{prospect_nom}')
+    #     my_canvas.drawString(30, 570, 'Email:')
+    #     my_canvas.drawString(30, 550, 'IBAN:')
+    #     my_canvas.drawString(30, 470, f'Numéro {nom_contact}:')
+    #     my_canvas.drawString(160, 470, f'Date {nom_contact}:')
+    #     my_canvas.drawString(350, 520, f'Nom du prospect : {prospect_nom} ')
+    #     my_canvas.drawString(350, 500, f'Nom du contact : {nom_contact}')
+    #     my_canvas.drawString(350, 480, f'Adresse du prospect :{prospect_nom}')
+    #     my_canvas.drawString(350, 460, f'Code et Ville du prospect :{prospect_nom}')
+    #     my_canvas.save()
     #     return send_file('canvas_form.pdf', attachment_filename='file.pdf')
-
-    #if __name__ == '__main__':
-     #   form('canvas_form.pdf', 'EPSI', ' PANNETIER_Magali')
+    #
+    # if __name__ == '__main__':
+    #     form('canvas_form.pdf', 'EPSI', ' PANNETIER_Magali')
 
 app.run(debug=True)

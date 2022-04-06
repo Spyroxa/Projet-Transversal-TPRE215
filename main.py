@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, Blueprint, session, request, redirect
+from flask import Flask, render_template, url_for, Blueprint, session, request, redirect,send_file
 from flask_wtf import FlaskForm
 from flask_bootstrap import Bootstrap
 from wtforms import StringField, SubmitField, BooleanField, IntegerField, \
@@ -8,7 +8,10 @@ from connectBDD import DBSingleton
 from insertion import ajouterEntreprise
 from login import LogUser,log,is_valid_session
 from visual import User
-
+from flask import render_template
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 
 
@@ -245,7 +248,38 @@ if __name__ == '__main__':
                     db_instance.query(sql)
                 except:
                     print('pas bon')
-            retourner = render_template('comForm.html')
-            return retourner
+        retourner = render_template('comForm.html')
+        return retourner
+
+
+
+    # @app.route('/pdf/<facture_id>')
+    #     def display_pdf(facture_id):
+    #             return send_file('canvas_form.pdf', attachment_filename='file.pdf')
+    #
+    # @app.route('/facture', methods=['POST', 'GET'])
+    #     def form(path, prospect_nom, nom_contact):
+    #         my_canvas = canvas.Canvas(path, pagesize=letter)
+    #         my_canvas.setLineWidth(.4)
+    #         my_canvas.setFont('Helvetica', 12)
+    #         my_canvas.drawString(30, 750, 'La jolie boite à code')
+    #         my_canvas.drawString(30, 715, 'adresse : ')
+    #         my_canvas.drawString(400, 680, 'FACTURE:')
+    #         my_canvas.drawString(30, 700, 'adresse entreprise:')
+    #         my_canvas.drawString(30, 640, 'N° de SIREN:')
+    #         my_canvas.drawString(30, 590, f'Tel. :{prospect_nom}')
+    #         my_canvas.drawString(30, 570, 'Email:')
+    #         my_canvas.drawString(30, 550, 'IBAN:')
+    #         my_canvas.drawString(30, 470, f'Numéro {nom_contact}:')
+    #         my_canvas.drawString(160, 470, f'Date {nom_contact}:')
+    #         my_canvas.drawString(350, 520, f'Nom du prospect : {prospect_nom} ')
+    #         my_canvas.drawString(350, 500, f'Nom du contact : {nom_contact}')
+    #         my_canvas.drawString(350, 480, f'Adresse du prospect :{prospect_nom}')
+    #         my_canvas.drawString(350, 460, f'Code et Ville du prospect :{prospect_nom}')
+    #         my_canvas.save()
+    #     return send_file('canvas_form.pdf', attachment_filename='file.pdf')
+
+    #if __name__ == '__main__':
+     #   form('canvas_form.pdf', 'EPSI', ' PANNETIER_Magali')
 
 app.run(debug=True)

@@ -5,7 +5,7 @@ from wtforms import StringField, SubmitField, BooleanField, IntegerField, Select
     EmailField,TextAreaField
 from wtforms.validators import DataRequired, NumberRange
 from connectBDD import DBSingleton
-
+from flask import render_template
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'this is not a secret'
 Bootstrap(app)
@@ -55,11 +55,10 @@ def log():
 
 
 def is_valid_session():
-    cookie = log()
-    return cookie[3]
+    session = log()
+    return session[3]
 
 def LogUser():
-
     form = authForm()
     title = 'login'
     result = render_template('user.html', form=form, title=title)

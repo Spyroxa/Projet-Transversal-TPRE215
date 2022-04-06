@@ -188,24 +188,20 @@ if __name__ == '__main__':
         sql = "SELECT auteur FROM commentaire"
         db.query(sql, )
         reponse = db.query(sql, )
-        if reponse == []:
-            print("pas d'prospect donc pas de contacts")
-        else:
-            if request.method == 'POST':
-                auteur = request.form['auteur']
-                description = request.form['description']
-                date = request.form['date']
-                print(request.form)
-                contact = getidcontact(request.form['contact'])
-                record = (auteur, description, date, contact)
-                print(record)
-                try:
-                    sql = """INSERT INTO commentaire (auteur, description, dateDeCreation, contact_idcontact) 
-                                                VALUES ('%s', '%s', '%s', '%s');""" % record
-                    db_instance = DBSingleton.Instance()
-                    db_instance.query(sql)
-                except:
-                    print('pas bon')
+        if request.method == 'POST':
+            auteur = request.form['auteur']
+            description = request.form['description']
+            date = request.form['date']
+            print(request.form)
+            record = (auteur, description, date)
+            print(record)
+            try:
+                sql = """INSERT INTO commentaire (auteur, description, dateDeCreation) 
+                                            VALUES ('%s', '%s', '%s');""" % record
+                db_instance = DBSingleton.Instance()
+                db_instance.query(sql)
+            except:
+                print('pas bon')
         retourner = render_template('comForm.html')
         return retourner
 

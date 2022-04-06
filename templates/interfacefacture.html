@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}  {{ title }}  {% endblock %}
+
+{% block content %}
+
+<div>
+    <div class="table">
+    <table>
+    {% for post in posts %}
+
+        <tr>
+            <th scope="col">Nom contact : {{ post[0] }}</th>
+            <th scope="col">Date facture: {{ post[1] }}</th>
+            <th scope="col">Numero facture : {{ post[2] }}</th>
+            <th scope="col">Nom prospect : {{ post[2] }}</th>
+        </tr>
+
+
+    {% endfor %}
+    </table>
+        <a href="/ajout-facture"><input class="modif"
+       type="button"
+       value="Ajouter une facture"></a>
+    </div>
+</div>
+<a href="/user"><input class="modif"
+       type="button"
+       value="Accueil"></a>
+{% endblock %}

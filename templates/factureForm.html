@@ -4,10 +4,10 @@
 <form method="post" class="centrer">
 
             <div>
-                <label> nom <input type="text" id="nom" name="nom"></label>
+                <label> Date de facture <input type="date" id="date" name="date"></label>
             </div>
             <div>
-                <label> prenom <input type="text" id="prenom" name="prenom"></label>
+                <label> Numero de facture <input type="number" id="numero" name="numero"></label>
             </div>
             <div>
                 <label> email<input type="email" id="email" name="email"></label>
@@ -18,20 +18,20 @@
             <div>
                 <label>poste <input type="text" id="poste" name="poste"></label>
             </div>
-            <p>Statut du contact</p>
-
-                <label>actif</label>
-                <input type="radio" class="bouton" id="statut" name="statut" value="1"/>
-
-
                 <label>entreprise </label>
                 <select id="prospect" name="prospect_idprospect">
                     {% for value in reponses %}
                         <option value="{{ value[0] }}">{{ value[1] }}</option>
                     {% endfor %}
                 </select>
+                <label>contact </label>
+                            <select id="contact" name="personne_idcontacts">
+                                {% for value in reponses %}
+                                    <option value="{{ value[0] }}">{{ value[1] }}</option>
+                                {% endfor %}
+                            </select>
 
-                <button class="button" type="submit">créer contact</button>
+                <button class="button" type="submit">créer facture</button>
                 <a href="/user"><input class="modif"
                    type="button"
                    value="Accueil"></a>

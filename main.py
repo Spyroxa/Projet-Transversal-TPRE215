@@ -1,9 +1,16 @@
 from imports import *
 from classes import *
+from flask import session
+from flask_session import Session
 
 if __name__ == '__main__':
     app = Flask(__name__)
+    app.secret_key = 'super secret key'
+
+    app.config['SESSION_TYPE'] = 'filesystem'
     Bootstrap(app)
+    app.config.from_object(__name__)
+    Session(app)
     db = DBSingleton.Instance()
     app.config['SECRET_KEY'] = 'this is not a secret'
 
@@ -59,46 +66,49 @@ if __name__ == '__main__':
 
     def getidcontact(nom):
         tab: tuple = (nom,)
-        sql = "SELECT idcontact FROM contact WHERE nom = %s;"
+        sql = "SELECT idcontacct FROM contact WHERE nom = %s;"
         reponse = db.query(sql, tab)
         idcontact = reponse[0]
         return stringer(idcontact)
 
     @app.route('/ajout-contact', methods=['GET', 'POST'])
     def ajoutContact():
+        print(session['key'])
         if is_valid_session:
-            sql = "SELECT nom FROM prospect"
+            sql = "SELECT idprospect, nom FROM prospect"
             db.query(sql, )
             reponse = db.query(sql, )
-            if reponse == []:
-                print("pas de prospect donc pas de contacts")
-            else:
-                if request.method == 'POST':
-                    nom = request.form['nom']
-                    prenom = request.form['prenom']
-                    email = request.form['email']
-                    poste = request.form['poste']
-                    telephone = request.form['telephone']
-                    print(request.form)
-                    actif = 1 if 'statut' in request.form else 0
-                    prospect = getidprospect(request.form['prospect'])
-                    record = (nom, prenom, email, poste, telephone, actif, prospect)
-                    print(record)
-                    try:
-                        sql = """INSERT INTO contact (nom, prenom, email, poste, telephone, statut, prospect_idprospect) 
-                                    VALUES ('%s', '%s', '%s', '%s', %s, '%s', %s);""" % record
-                        db_instance = DBSingleton.Instance()
-                        db_instance.query(sql)
-                    except:
-                        print('pas bon')
-            retourner = render_template('contactForm.html', reponses=reponse)
+            if request.method == 'POST':
+                nom = request.form['nom']
+                prenom = request.form['prenom']
+                email = request.form['email']
+                poste = request.form['poste']
+                telephone = request.form['telephone']
+                print(request.form)
+                actif = 1 if 'statut' in request.form else 0
+                prospect_idprospect = request.form['prospect_idprospect']
+                record = (nom, prenom, email, poste, telephone, actif, prospect_idprospect)
+                print(record)
+                try:
+                    sql = """INSERT INTO contact (nom, prenom, email, poste, telephone, statut, prospect_idprospect) 
+                                VALUES ('%s', '%s', '%s', '%s', %s, '%s', %s);""" % record
+                    db_instance = DBSingleton.Instance()
+                    db_instance.query(sql)
+                except:
+                    print('pas bon')
+            retourner = render_template('ajoutcontact.html', reponses=reponse)
         return retourner
 
 
     @app.route('/', methods=['POST', 'GET'])
     def appeLogin():
+        session['key'] = 'value'
         return LogUser()
 
+
+    @app.route('/logout')
+    def logout():
+        return 'Logout'
     @app.route('/user', methods=['POST', 'GET'])
     def user():
         if is_valid_session:
@@ -136,6 +146,7 @@ if __name__ == '__main__':
         posts = db_instance.query(sql)
         retourner = render_template('interfacecontact.html', title=title, posts=posts)
         form = BarreDeRecherche()
+        #essai de la barre de recherche
         if form.validate_on_submit():
             recherche = request.form["filtre"]
             sql = f"SELECT nom,email FROM contact WHERE nom OR email LIKE '{recherche}%'"
@@ -151,7 +162,7 @@ if __name__ == '__main__':
         sql = "SELECT idprospect, nom FROM prospect"
         db.query(sql, )
         nom_prospet = db.query(sql, )
-        sql2 = "SELECT idcontact, nom FROM contact"
+        sql2 = "SELECT idcontacct, nom FROM contact"
         db.query(sql2, )
         nom_contact = db.query(sql2)
         retourner = render_template('contactForm.html', reponses=nom_prospet, choices=nom_contact)
@@ -166,7 +177,7 @@ if __name__ == '__main__':
             prospect = request.form['prospect']
             sql = f"""UPDATE contact SET nom = '{nom}', prenom = '{prenom}', email = '{email}',
                       poste = '{poste}', telephone = {telephone}, statut = {actif},
-                      prospect_idprospect = {prospect} WHERE idcontact ={modified}"""
+                      prospect_idprospect = {prospect} WHERE idcontacct ={modified}"""
             print(sql)
             db_instance = DBSingleton.Instance()
             db_instance.query(sql)
@@ -205,8 +216,42 @@ if __name__ == '__main__':
         retourner = render_template('comForm.html')
         return retourner
 
+    @app.route('/ajout-facture', methods=['POST', 'GET'])
+    def ajoutfacture():
+        if is_valid_session:
+            sql = "SELECT idprospect, nom FROM prospect"
+            db.query(sql, )
+            nom_prospect = db.query(sql, )
+            sql2 = "SELECT idcontacct, nom FROM contact"
+            db.query(sql2, )
+            nom_contact = db.query(sql2)
+            retourner = render_template('factureForm.html', reponses=nom_prospect, choices=nom_contact)
+            if request.method == 'POST':
+                date = request.form['date']
+                numero = request.form['numero']
+                print(request.form)
+                prospect_idprospect = request.form['prospect_idprospect']
+                personne_idcontacts = request.form['personne_idcontacts']
+                record = (date, numero, prospect_idprospect, personne_idcontacts)
+                print(record)
+                sql = """INSERT INTO facture (dateFacture, numeroFacture ,prospect_idprospect, personne_idcontact) 
+                         VALUES ('%s', '%s', '%s', '%s');""" % record
+                db_instance = DBSingleton.Instance()
+                db_instance.query(sql)
+
+            return retourner
+    @app.route('/facture', methods=['POST', 'GET'])
+    def facture():
+        title = 'formulaire'
+        sql = """SELECT  contact.nom,dateFacture,numeroFacture,prospect.nom AS 'nom prospect' FROM facture JOIN prospect ON prospect_idprospect=prospect.idprospect JOIN contact ON personne_idcontact=contact.idcontacct"""
+        db_instance = DBSingleton.Instance()
+        posts = db_instance.query(sql)
+        retourner = render_template('interfacefacture.html', title=title, posts=posts)
+        return retourner
 
 
+
+   #essai d'affichage de facture en pdf non réussi
     # @app.route('/pdf/<facture_id>')
     #     def display_pdf(facture_id):
     #             return send_file('canvas_form.pdf', attachment_filename='file.pdf')

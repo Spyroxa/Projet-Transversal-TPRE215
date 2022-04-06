@@ -187,26 +187,29 @@ if __name__ == '__main__':
 
     @app.route('/editer-contact', methods=['GET', 'POST'])
     def modifContact():
-        sql = "SELECT nom FROM contact"
+        sql = "SELECT idprospect, nom FROM prospect"
         db.query(sql, )
-        reponse = db.query(sql, )
-        if verificationContactDejaExistant(reponse) == True:
-            if request.method == 'POST':
-                nom = request.form['nom']
-                prenom = request.form['prenom']
-                email = request.form['email']
-                poste = request.form['poste']
-                telephone = request.form['telephone']
-                actif = 1 if 'statut' in request.form else 0
-                prospect = getidprospect(request.form['prospect'])
-                record = (nom, prenom, email, poste, telephone, actif, prospect)
-            sql = "UPDATE contact SET nom = '%s', prenom = '%s', email = '%s', " \
-                  "poste = '%s', telephone = %s, actif = %s, " \
-                  "prospect = '%s',  " % record
+        nom_prospet = db.query(sql, )
+        sql2 = "SELECT idcontact, nom FROM contact"
+        db.query(sql2, )
+        nom_contact = db.query(sql2)
+        retourner = render_template('contactForm.html', reponses=nom_prospet, choices=nom_contact)
+        if request.method == 'POST':
+            modified = request.form['id']
+            nom = request.form['nom']
+            prenom = request.form['prenom']
+            email = request.form['email']
+            poste = request.form['poste']
+            telephone = request.form['telephone']
+            actif = 1 if 'statut' in request.form else 0
+            prospect = request.form['prospect']
+            sql = f"""UPDATE contact SET nom = '{nom}', prenom = '{prenom}', email = '{email}',
+                      poste = '{poste}', telephone = {telephone}, statut = {actif},
+                      prospect_idprospect = {prospect} WHERE idcontact ={modified}"""
+            print(sql)
             db_instance = DBSingleton.Instance()
             db_instance.query(sql)
-            retourner = render_template('contactForm.html', reponses=reponse)
-            return retourner
+        return retourner
 
 
 

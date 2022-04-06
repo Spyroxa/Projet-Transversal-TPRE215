@@ -2,6 +2,13 @@
 {% import "bootstrap/wtf.html" as wtf%}
 {% block content %}
 <form method="post" class="centrer">
+    <label>qui voulez-vous modifier?</label>
+                <select id="id" name="id">
+
+                    {% for value in choices %}
+                        <option value="{{ value[0] }}">{{ value[1] }}</option>
+                    {% endfor %}
+                </select>
             <div>
                 <label> nom <input type="text" id="nom" name="nom"></label>
             </div>
@@ -23,10 +30,11 @@
                 <input type="radio" class="boutonmerde" id="statut" name="statut" value="1"/>
 
 
-                <label>entreprise </label>
-                <select id="entreprise" name="entreprise">
+                <label>entreprise</label>
+                <select id="entreprise" name="prospect">
+
                     {% for value in reponses %}
-                        <option value="{{ value[0] }}">{{ value[0] }} {{ value[1] }}</option>
+                        <option value="{{ value[0] }}">{{ value[1] }}</option>
                     {% endfor %}
                 </select>
 

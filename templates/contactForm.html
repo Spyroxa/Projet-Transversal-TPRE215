@@ -20,17 +20,20 @@
             <p>Statut du contact</p>
 
                 <label>actif</label>
-                <input type="radio" class="boutonmerde" id="statut" name="statut" value="1"/>
+                <input type="radio" class="bouton" id="statut" name="statut" value="1"/>
 
 
                 <label>entreprise </label>
-                <select id="entreprise" name="entreprise">
+                <select id="prospect" name="prospect">
                     {% for value in reponses %}
                         <option value="{{ value[0] }}">{{ value[0] }} {{ value[1] }}</option>
                     {% endfor %}
                 </select>
 
                 <button class="button" type="submit">créer contact</button>
+                <a href="/user"><input class="modif"
+                   type="button"
+                   value="Accueil"></a>
             </div>
         </form>
 {% endblock %}
